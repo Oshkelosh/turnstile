@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Cloudflare Turnstile{% endblock %}
+
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+  <h2 style="margin:0;">Cloudflare Turnstile</h2>
+  <a href="/admin/tools" class="btn btn--secondary">← Back to Tools</a>
+</div>
+
+<p style="color:var(--clr-text-muted);margin:0 0 20px;font-size:14px;">
+  Keys come from the Cloudflare dashboard (Turnstile). The site key is public.
+  The secret stays in addon config. When this addon is active, registration, customer login,
+  password-reset requests, and admin login require a passing token.
+  Local test keys: site <code>1x00000000000000000000AA</code> always passes,
+  site <code>2x00000000000000000000AB</code> always blocks,
+  secret <code>1x0000000000000000000000000000000AA</code> always passes.
+</p>
+
+<form method="POST" action="/admin/tools/turnstile/settings">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+  <div class="card" style="margin-bottom:16px;">
+    <h3 style="margin-top:0;">Addon status</h3>
+    <label style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+      <input type="checkbox" name="is_enabled" value="on" {% if addon and addon.is_enabled %}checked{% endif %}>
+      Enable Turnstile addon
+    </label>
+    <label style="display:flex;align-items:center;gap:8px;">
+      <input type="checkbox" name="is_active" value="on" {% if config.get('is_active', True) %}checked{% endif %}>
+      Active (both keys below are required)
+    </label>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="form-group">
+      <label class="form-label">Site key</label>
+      <input type="text" name="site_key" class="form-input" maxlength="256" value="{{ config.get('site_key', '') }}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Secret key</label>
+      <input type="password" name="secret_key" class="form-input" maxlength="256" placeholder="Leave blank to keep existing" autocomplete="off">
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn--primary">Save</button>
+</form>
+{% endblock %}
